@@ -98,11 +98,11 @@
                     Total Portfolio
                 </div>
 
-                <div class="card-value">
+                <div class="card-value" id="kpi-portfolio">
                     ₹1.00 Cr
                 </div>
 
-                <div class="positive">
+                <div class="positive" id="kpi-portfolio-sub">
                     ↑ 4.8% expected return
                 </div>
 
@@ -115,11 +115,11 @@
                     Risk Score
                 </div>
 
-                <div class="card-value">
+                <div class="card-value" id="kpi-risk">
                     32<span class="small-text">/100</span>
                 </div>
 
-                <div class="safe">
+                <div class="safe" id="kpi-risk-status">
                     ● SAFE
                 </div>
 
@@ -132,11 +132,11 @@
                     Liquidity
                 </div>
 
-                <div class="card-value">
+                <div class="card-value" id="kpi-liquidity">
                     24%
                 </div>
 
-                <div class="positive">
+                <div class="positive" id="kpi-liquidity-status">
                     ● Healthy
                 </div>
 
@@ -149,7 +149,7 @@
                     Expected Return
                 </div>
 
-                <div class="card-value">
+                <div class="card-value" id="kpi-return">
                     8.9%
                 </div>
 
@@ -201,7 +201,7 @@
 
                 <div class="risk-score">
                     <div class="score-circle">
-                        <strong>32</strong>
+                        <strong id="ro-score">32</strong>
                         <span>/100</span>
                     </div>
                 </div>
@@ -214,7 +214,7 @@
                     </div>
 
                     <div class="progress">
-                        <div style="width:28%"></div>
+                        <div id="ro-market" style="width:28%"></div>
                     </div>
 
                 </div>
@@ -228,7 +228,7 @@
                     </div>
 
                     <div class="progress">
-                        <div style="width:18%"></div>
+                        <div id="ro-liquidity" style="width:18%"></div>
                     </div>
 
                 </div>
@@ -242,7 +242,7 @@
                     </div>
 
                     <div class="progress">
-                        <div style="width:35%"></div>
+                        <div id="ro-concentration" style="width:35%"></div>
                     </div>
 
                 </div>
@@ -272,39 +272,41 @@
                 </div>
 
 
-                <div class="alert success">
+                <div id="risk-alerts-list">
+                    <div class="alert success">
 
-                    <div class="alert-icon">✓</div>
+                        <div class="alert-icon">✓</div>
 
-                    <div>
-                        <strong>Liquidity requirement satisfied</strong>
-                        <p>Available liquidity: 24%</p>
+                        <div>
+                            <strong>Liquidity requirement satisfied</strong>
+                            <p>Available liquidity: 24%</p>
+                        </div>
+
                     </div>
 
-                </div>
 
+                    <div class="alert warning">
 
-                <div class="alert warning">
+                        <div class="alert-icon">!</div>
 
-                    <div class="alert-icon">!</div>
+                        <div>
+                            <strong>Volatility approaching threshold</strong>
+                            <p>Current: 18% | Limit: 20%</p>
+                        </div>
 
-                    <div>
-                        <strong>Volatility approaching threshold</strong>
-                        <p>Current: 18% | Limit: 20%</p>
                     </div>
 
-                </div>
 
+                    <div class="alert success">
 
-                <div class="alert success">
+                        <div class="alert-icon">✓</div>
 
-                    <div class="alert-icon">✓</div>
+                        <div>
+                            <strong>Portfolio within allocation limits</strong>
+                            <p>No critical exposure detected</p>
+                        </div>
 
-                    <div>
-                        <strong>Portfolio within allocation limits</strong>
-                        <p>No critical exposure detected</p>
                     </div>
-
                 </div>
 
             </div>

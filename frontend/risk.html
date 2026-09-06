@@ -55,10 +55,10 @@
                 <p>Overall Portfolio Risk</p>
 
                 <div class="big-risk">
-                    32<span>/100</span>
+                    <span id="risk-score">32</span><span>/100</span>
                 </div>
 
-                <span class="badge safe-badge">
+                <span id="risk-status-badge" class="badge safe-badge">
                     ● SAFE
                 </span>
 
@@ -66,9 +66,9 @@
 
             <div class="risk-message">
 
-                <h3>Portfolio is within safe limits</h3>
+                <h3 id="risk-message-title">Portfolio is within safe limits</h3>
 
-                <p>
+                <p id="risk-message-desc">
                     No critical risk threshold has been breached.
                     Continue monitoring market volatility.
                 </p>
@@ -89,11 +89,11 @@
 
                     <div class="metric-heading">
                         <span>Market Risk</span>
-                        <strong>28%</strong>
+                        <strong id="risk-market-val">28%</strong>
                     </div>
 
                     <div class="progress large">
-                        <div style="width:28%"></div>
+                        <div id="risk-market-bar" style="width:28%"></div>
                     </div>
 
                 </div>
@@ -103,11 +103,11 @@
 
                     <div class="metric-heading">
                         <span>Liquidity Risk</span>
-                        <strong>18%</strong>
+                        <strong id="risk-liquidity-val">18%</strong>
                     </div>
 
                     <div class="progress large">
-                        <div style="width:18%"></div>
+                        <div id="risk-liquidity-bar" style="width:18%"></div>
                     </div>
 
                 </div>
@@ -117,11 +117,11 @@
 
                     <div class="metric-heading">
                         <span>Concentration Risk</span>
-                        <strong>35%</strong>
+                        <strong id="risk-concentration-val">35%</strong>
                     </div>
 
                     <div class="progress large">
-                        <div style="width:35%"></div>
+                        <div id="risk-concentration-bar" style="width:35%"></div>
                     </div>
 
                 </div>
@@ -131,11 +131,11 @@
 
                     <div class="metric-heading">
                         <span>Drawdown</span>
-                        <strong>6%</strong>
+                        <strong id="risk-drawdown-val">6%</strong>
                     </div>
 
                     <div class="progress large">
-                        <div style="width:6%"></div>
+                        <div id="risk-drawdown-bar" style="width:6%"></div>
                     </div>
 
                 </div>
@@ -160,7 +160,7 @@
 
                     </thead>
 
-                    <tbody>
+                    <tbody id="risk-thresholds-body">
 
                         <tr>
                             <td>Equity Exposure</td>

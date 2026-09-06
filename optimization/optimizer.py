@@ -352,6 +352,7 @@ class PortfolioOptimizer:
             - 'liquidity_crisis': Liquidity requirement raised to 35%, cash min to 20%
             - 'stagflation': Gold surges to 14%, Equity drops to 5%
             - 'rate_hike': Cash yield rises to 6.5%, Bond yields drop to 3.5%
+            - 'market_crash': Broad sell-off across equities and corp bonds, gold rises, vol spike.
         """
         import copy
         assets_copy = copy.deepcopy(self.assets)
@@ -388,6 +389,18 @@ class PortfolioOptimizer:
                     a.expected_return = 0.065
                 elif a.name == "Bonds":
                     a.expected_return = 0.035
+
+        elif scenario == "market_crash":
+            for a in assets_copy:
+                if a.name == "Equity":
+                    a.expected_return = -0.08
+                    a.risk_score = 0.38
+                elif a.name == "Corporate Bonds":
+                    a.expected_return = -0.02
+                    a.risk_score = 0.20
+                elif a.name == "Gold":
+                    a.expected_return = 0.03
+            cov_copy *= 1.6
 
         else:
             raise ValueError(f"Unknown stress test scenario: '{scenario}'")

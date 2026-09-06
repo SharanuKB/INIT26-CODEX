@@ -1,87 +1,45 @@
-// ==========================================
-// CAPITALGUARD - RISK MONITOR
-// ==========================================
+async function checkRiskStatus() {
+    try {
+        const response = await fetch('/api/risk');
+        const data = await response.json();
+        
+        document.getElementById("risk-score").textContent = Math.round(data.overall_risk);
+        
+        const badge = document.getElementById("risk-status-badge");
+        badge.textContent = `● ${data.status}`;
+        badge.className = `badge ${data.status === 'SAFE' ? 'safe-badge' : 'warning-badge'}`;
+        
+        document.getElementById("risk-message-title").textContent = data.message;
+        document.getElementById("risk-message-desc").textContent = 
+            data.status === 'SAFE' ? "No critical risk threshold has been breached. Continue monitoring market volatility." : 
+            "Risk thresholds have been breached. System recommends rebalancing.";
 
-// Demo risk data
-const riskData = {
-    overallRisk: 32,
-    marketRisk: 28,
-    liquidityRisk: 18,
-    concentrationRisk: 35,
-    drawdown: 6,
-    equityExposure: 35,
-    liquidity: 24,
-    volatility: 18
-};
-
-
-// Check whether risk values are within limits
-function checkRiskStatus() {
-
-    const equityLimit = 40;
-    const liquidityLimit = 20;
-    const volatilityLimit = 20;
-    const drawdownLimit = 10;
-
-    console.log("Risk Monitoring Started");
-
-    if (riskData.equityExposure > equityLimit) {
-        console.log("🚨 Equity exposure limit breached");
-    } else {
-        console.log("✓ Equity exposure is safe");
-    }
-
-    if (riskData.liquidity < liquidityLimit) {
-        console.log("🚨 Liquidity requirement breached");
-    } else {
-        console.log("✓ Liquidity requirement satisfied");
-    }
-
-    if (riskData.volatility >= volatilityLimit) {
-        console.log("⚠️ Volatility threshold reached");
-    } else {
-        console.log("✓ Volatility is within limit");
-    }
-
-    if (riskData.drawdown >= drawdownLimit) {
-        console.log("🚨 Drawdown limit breached");
-    } else {
-        console.log("✓ Drawdown is within limit");
+        const updateMetric = (idPrefix, val) => {
+            const elVal = document.getElementById(`${idPrefix}-val`);
+            const elBar = document.getElementById(`${idPrefix}-bar`);
+            if (elVal) elVal.textContent = `${Math.round(val)}%`;
+            if (elBar) elBar.style.width = `${Math.round(val)}%`;
+        };
+        
+        updateMetric("risk-market", data.market_risk);
+        updateMetric("risk-liquidity", data.liquidity_risk);
+        updateMetric("risk-concentration", data.concentration_risk);
+        updateMetric("risk-drawdown", data.drawdown);
+        
+        const tbody = document.getElementById("risk-thresholds-body");
+        if (tbody) {
+            tbody.innerHTML = data.thresholds.map(t => `
+                <tr>
+                    <td>${t.metric}</td>
+                    <td>${t.current_pct.toFixed(2)}%</td>
+                    <td>${t.limit_pct}%</td>
+                    <td><span class="${t.status === 'SAFE' ? 'table-safe' : 'table-warning'}">${t.status}</span></td>
+                </tr>
+            `).join('');
+        }
+    } catch (e) {
+        console.error("Risk fetch failed", e);
     }
 }
 
-
-// Calculate overall risk status
-function getRiskStatus(score) {
-
-    if (score < 40) {
-        return {
-            status: "SAFE",
-            message: "Portfolio is within safe limits."
-        };
-    }
-
-    if (score < 70) {
-        return {
-            status: "WARNING",
-            message: "Portfolio risk is increasing. Monitoring required."
-        };
-    }
-
-    return {
-        status: "CRITICAL",
-        message: "Critical risk detected. Rebalancing required."
-    };
-}
-
-
-// Run risk monitoring
-checkRiskStatus();
-
-
-// Display result in browser console
-const result = getRiskStatus(riskData.overallRisk);
-
-console.log("Overall Risk:", riskData.overallRisk);
-console.log("Status:", result.status);
-console.log(result.message);
+document.addEventListener("DOMContentLoaded", checkRiskStatus);
