@@ -12,13 +12,14 @@ CapitalGuard is an automated capital management and optimization tool designed t
    ```
 
 2. **Start the Application:**
-   Run the Flask server:
+   Run the FastAPI server via Uvicorn:
    ```bash
    python app.py
    ```
 
-3. **Access the Dashboard:**
-   Open your browser and navigate to: [http://localhost:5000](http://localhost:5000)
+3. **Access the Application:**
+   - **Dashboard**: Open your browser and navigate to: [http://localhost:5000](http://localhost:5000)
+   - **Interactive API Docs (Swagger UI)**: Test endpoints at [http://localhost:5000/docs](http://localhost:5000/docs)
 
 ## The Financial Model
 
@@ -59,6 +60,7 @@ The platform includes a robust simulation engine for 5 hypothetical market shock
 - **Mean-Variance vs. Linear:** Mean-variance realistically models correlations (e.g., Equity vs. Bonds), capturing diversification benefits better than linear sum-of-parts risk.
 - **SLSQP with LP Fallback:** SLSQP is powerful for quadratic constraints but sensitive to initial conditions. The LP fallback ensures the system always returns a safe, compliant allocation even under extreme numerical stress.
 - **Risk Score Normalization:** For the UI, raw portfolio volatility (typically 0.05 - 0.20) is scaled to a human-readable 0-100 score (`volatility / 0.30 * 100`).
+- **FastAPI Migration:** The backend was migrated from Flask to FastAPI to provide out-of-the-box async readiness, automatic strict request validation using Pydantic (throwing 422s for bad inputs instead of 500s), and auto-generated OpenAPI documentation accessible at `/docs`.
 
 ## API Reference
 
