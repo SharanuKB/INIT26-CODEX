@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CapitalGuard - Risk Monitor</title>
+
+     <link rel="stylesheet" href="../css/style.css">
+
+</head>
+
+<body>
+
+<div class="app">
+
+    <aside class="sidebar">
+
+        <div class="brand">
+            <div class="logo-icon small">CG</div>
+            <span>CapitalGuard</span>
+        </div>
+
+        <nav>
+
+            <a href="dashboard.html">📊 Dashboard</a>
+            <a href="optimization.html">⚙️ Optimization</a>
+            <a class="active" href="risk.html">🛡️ Risk Monitor</a>
+            <a href="simulation.html">💥 Simulation</a>
+            <a href="rebalance.html">🔄 Rebalancing</a>
+
+        </nav>
+
+    </aside>
+
+
+    <main class="main">
+
+        <header class="topbar">
+
+            <div>
+                <h1>Risk Control Center</h1>
+                <p>Monitor portfolio risk and control thresholds</p>
+            </div>
+
+        </header>
+
+
+        <div class="risk-main-card">
+
+            <div>
+
+                <p>Overall Portfolio Risk</p>
+
+                <div class="big-risk">
+                    <span id="risk-score">32</span><span>/100</span>
+                </div>
+
+                <span id="risk-status-badge" class="badge safe-badge">
+                    ● SAFE
+                </span>
+
+            </div>
+
+            <div class="risk-message">
+
+                <h3 id="risk-message-title">Portfolio is within safe limits</h3>
+
+                <p id="risk-message-desc">
+                    No critical risk threshold has been breached.
+                    Continue monitoring market volatility.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="risk-grid">
+
+
+            <div class="panel">
+
+                <h2>Risk Metrics</h2>
+
+                <div class="metric-large">
+
+                    <div class="metric-heading">
+                        <span>Market Risk</span>
+                        <strong id="risk-market-val">28%</strong>
+                    </div>
+
+                    <div class="progress large">
+                        <div id="risk-market-bar" style="width:28%"></div>
+                    </div>
+
+                </div>
+
+
+                <div class="metric-large">
+
+                    <div class="metric-heading">
+                        <span>Liquidity Risk</span>
+                        <strong id="risk-liquidity-val">18%</strong>
+                    </div>
+
+                    <div class="progress large">
+                        <div id="risk-liquidity-bar" style="width:18%"></div>
+                    </div>
+
+                </div>
+
+
+                <div class="metric-large">
+
+                    <div class="metric-heading">
+                        <span>Concentration Risk</span>
+                        <strong id="risk-concentration-val">35%</strong>
+                    </div>
+
+                    <div class="progress large">
+                        <div id="risk-concentration-bar" style="width:35%"></div>
+                    </div>
+
+                </div>
+
+
+                <div class="metric-large">
+
+                    <div class="metric-heading">
+                        <span>Drawdown</span>
+                        <strong id="risk-drawdown-val">6%</strong>
+                    </div>
+
+                    <div class="progress large">
+                        <div id="risk-drawdown-bar" style="width:6%"></div>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="panel">
+
+                <h2>Control Thresholds</h2>
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+                            <th>Metric</th>
+                            <th>Current</th>
+                            <th>Limit</th>
+                            <th>Status</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="risk-thresholds-body">
+
+                        <tr>
+                            <td>Equity Exposure</td>
+                            <td>35%</td>
+                            <td>40%</td>
+                            <td><span class="table-safe">SAFE</span></td>
+                        </tr>
+
+                        <tr>
+                            <td>Liquidity</td>
+                            <td>24%</td>
+                            <td>20%</td>
+                            <td><span class="table-safe">SAFE</span></td>
+                        </tr>
+
+                        <tr>
+                            <td>Volatility</td>
+                            <td>18%</td>
+                            <td>20%</td>
+                            <td><span class="table-warning">WARNING</span></td>
+                        </tr>
+
+                        <tr>
+                            <td>Drawdown</td>
+                            <td>6%</td>
+                            <td>10%</td>
+                            <td><span class="table-safe">SAFE</span></td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+<script src="../js/app.js"></script>
+<script src="../js/risk.js"></script>
+
+
+
+</body>
+</html>

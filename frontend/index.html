@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CapitalGuard - Login</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body class="login-body">
+
+    <div class="login-container">
+
+        <div class="login-logo">
+            <div class="logo-icon">CG</div>
+            <h1>CapitalGuard</h1>
+            <p>Asset & Capital Optimization Platform</p>
+        </div>
+
+        <!-- LOGIN VIEW -->
+        <div class="login-card" id="loginView">
+
+            <h2>Welcome Back</h2>
+            <p class="login-subtitle">Sign in to your risk management dashboard</p>
+
+            <label>Username</label>
+            <input type="text" id="username" placeholder="Enter username">
+
+            <label>Password</label>
+            <input type="password" id="password" placeholder="Enter password">
+
+            <button class="primary-btn" onclick="login()">Login</button>
+            <p style="text-align: center; margin-top: 15px; font-size: 0.9rem;">Don't have an account? <a href="#" onclick="toggleView('register')" style="color: var(--primary);">Register</a></p>
+
+            <p id="loginMessage" class="login-message"></p>
+
+        </div>
+
+        <!-- REGISTER VIEW -->
+        <div class="login-card" id="registerView" style="display: none;">
+
+            <h2>Create Account</h2>
+            <p class="login-subtitle">Join the CapitalGuard platform</p>
+
+            <label>Username</label>
+            <input type="text" id="regUsername" placeholder="Choose a username">
+
+            <label>Password</label>
+            <input type="password" id="regPassword" placeholder="Create a password">
+
+            <label>Confirm Password</label>
+            <input type="password" id="regConfirmPassword" placeholder="Confirm your password">
+
+            <button class="primary-btn" onclick="register()">Register</button>
+            <p style="text-align: center; margin-top: 15px; font-size: 0.9rem;">Already have an account? <a href="#" onclick="toggleView('login')" style="color: var(--primary);">Login</a></p>
+
+            <p id="registerMessage" class="login-message"></p>
+
+        </div>
+
+        <p class="login-footer">Secure Financial Management System</p>
+
+    </div>
+
+    <script src="../js/app.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CapitalGuard - Simulation</title>
+
+   <link rel="stylesheet" href="../css/style.css">
+
+</head>
+
+<body>
+
+<div class="app">
+
+    <aside class="sidebar">
+
+        <div class="brand">
+            <div class="logo-icon small">CG</div>
+            <span>CapitalGuard</span>
+        </div>
+
+        <nav>
+
+            <a href="dashboard.html">📊 Dashboard</a>
+            <a href="optimization.html">⚙️ Optimization</a>
+            <a href="risk.html">🛡️ Risk Monitor</a>
+            <a class="active" href="simulation.html">💥 Simulation</a>
+            <a href="rebalance.html">🔄 Rebalancing</a>
+
+        </nav>
+
+    </aside>
+
+
+    <main class="main">
+
+        <header class="topbar">
+
+            <div>
+                <h1>Market Shock Simulator</h1>
+                <p>Test portfolio resilience under hypothetical scenarios</p>
+            </div>
+
+        </header>
+
+
+        <div class="simulation-layout">
+
+
+            <div class="panel">
+
+                <h2>Select Scenario</h2>
+
+                <p class="panel-description">
+                    Simulate how your portfolio reacts to market events.
+                </p>
+
+
+                <label>Scenario</label>
+
+                <select id="scenario" class="form-input">
+
+                    <option value="crash">
+                        Market Crash
+                    </option>
+
+                    <option value="interest">
+                        Interest Rate Increase
+                    </option>
+
+                    <option value="liquidity">
+                        Liquidity Crisis
+                    </option>
+
+                    <option value="equity">
+                        Equity Crash
+                    </option>
+
+                </select>
+
+
+                <button
+                    class="danger-btn"
+                    onclick="runSimulation()"
+                >
+                    💥 Run Simulation
+                </button>
+
+            </div>
+
+
+            <div class="panel">
+
+                <h2>Simulation Result</h2>
+
+                <div id="simulationResult">
+
+                    <div class="simulation-stat">
+
+                        <span>Portfolio Before</span>
+
+                        <strong>₹1,00,00,000</strong>
+
+                    </div>
+
+
+                    <div class="simulation-stat">
+
+                        <span>Portfolio After</span>
+
+                        <strong id="afterValue">
+                            ₹1,00,00,000
+                        </strong>
+
+                    </div>
+
+
+                    <div class="simulation-stat">
+
+                        <span>Loss</span>
+
+                        <strong id="lossValue">
+                            0%
+                        </strong>
+
+                    </div>
+
+
+                    <div class="simulation-stat">
+
+                        <span>Risk Score</span>
+
+                        <strong id="simulationRisk">
+                            32 / 100
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div
+            id="simulationMessage"
+            class="panel recommendation"
+        >
+
+            <h2>💡 System Response</h2>
+
+            <p>
+                Select a scenario and run the simulation to see
+                the automated risk response.
+            </p>
+
+        </div>
+
+    </main>
+
+</div>
+
+<script src="../js/app.js"></script>
+<script src="../js/simulation.js"></script>
+
+</body>
+</html>

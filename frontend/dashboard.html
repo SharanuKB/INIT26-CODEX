@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CapitalGuard - Dashboard</title>
+
+    <script>
+        // Client-side auth guard
+        if (localStorage.getItem("capitalguard_logged_in") !== "true") {
+            window.location.href = "index.html";
+        }
+    </script>
+
+   <link rel="stylesheet" href="../css/style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+            <div class="logo-icon small">CG</div>
+            <span>CapitalGuard</span>
+        </div>
+
+        <nav>
+
+            <a class="active" href="dashboard.html">
+                📊 Dashboard
+            </a>
+
+            <a href="optimization.html">
+                ⚙️ Optimization
+            </a>
+
+            <a href="risk.html">
+                🛡️ Risk Monitor
+            </a>
+
+            <a href="simulation.html">
+                💥 Simulation
+            </a>
+
+            <a href="rebalance.html">
+                🔄 Rebalancing
+            </a>
+
+            <a href="#" onclick="logout(); return false;" style="margin-top: 2rem; color: #d64545;">
+                🚪 Logout
+            </a>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+
+            <div class="user-box">
+                <div class="avatar">RM</div>
+
+                <div>
+                    <strong>Risk Manager</strong>
+                    <small>Administrator</small>
+                </div>
+            </div>
+
+            <button onclick="logout()" class="logout-btn">
+                Logout
+            </button>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN -->
+
+    <main class="main">
+        <header class="topbar">
+            <div>
+                <h1>Live Dashboard</h1>
+                <p>Synthetic Market Engine & Inverse-Vol Optimizer</p>
+            </div>
+            <div class="status">
+                <span class="status-dot"></span> System Operational
+            </div>
+        </header>
+
+        <section class="cards">
+            <div class="card">
+                <div class="card-title">Risk Engine Status</div>
+                <div class="card-value" id="kpi-risk-status">● OK</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Concentration Max</div>
+                <div class="card-value" id="risk-conc-val">--</div>
+                <div class="safe" id="risk-conc-status">--</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Volatility Spike Max</div>
+                <div class="card-value" id="risk-vol-val">--</div>
+                <div class="safe" id="risk-vol-status">--</div>
+            </div>
+        </section>
+
+        <section class="dashboard-grid">
+            <div class="panel">
+                <div class="panel-header">
+                    <div><h2>Asset Allocation</h2><p>Live target weights</p></div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="allocationChart"></canvas>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-header">
+                    <div><h2>Control Actions</h2><p>Live and hypothetical</p></div>
+                </div>
+                
+                <h4 style="margin-top:1rem;">⚡ Simulate Live Shock</h4>
+                <div style="display:flex; gap:10px; margin-top:5px; margin-bottom: 20px;">
+                    <select id="shock-asset" class="primary-btn" style="background:#f1f3f5; color:#333;">
+                        <option value="Equity">Equity</option>
+                        <option value="Bonds">Bonds</option>
+                        <option value="Gold">Gold</option>
+                        <option value="Crypto">Crypto</option>
+                        <option value="Cash">Cash</option>
+                    </select>
+                    <input type="number" id="shock-multiplier" value="5.0" step="0.5" style="width:70px; padding:5px;">
+                    <button class="primary-btn" onclick="simulateShock()">Shock</button>
+                </div>
+
+                <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 15px 0;">
+
+                <h4>🔮 Run Scenario (No DB Write)</h4>
+                <div style="display:flex; gap:10px; margin-top:5px;">
+                    <select id="scenario-asset" class="primary-btn" style="background:#f1f3f5; color:#333;">
+                        <option value="Equity">Equity</option>
+                        <option value="Bonds">Bonds</option>
+                        <option value="Gold">Gold</option>
+                        <option value="Crypto">Crypto</option>
+                        <option value="Cash">Cash</option>
+                    </select>
+                    <input type="number" id="scenario-multiplier" value="10.0" step="0.5" style="width:70px; padding:5px;">
+                    <button class="primary-btn" onclick="runScenario()" style="background:#3182ce;">Run</button>
+                </div>
+                <div id="scenario-result" style="margin-top: 10px; font-size: 0.9rem; color: #4a5568;"></div>
+            </div>
+        </section>
+
+        <section class="dashboard-grid">
+            <div class="panel" style="grid-column: span 2;">
+                <div class="panel-header">
+                    <div><h2>Risk Alerts Feed</h2><p>Latest breaches from DB</p></div>
+                </div>
+                <div id="risk-alerts-list" style="max-height: 300px; overflow-y: auto;">
+                    <!-- Alerts injected here -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+</div>
+
+<script src="../js/app.js"></script>
+<script src="../js/dashboard.js"></script>
+
+</body>
+</html>
