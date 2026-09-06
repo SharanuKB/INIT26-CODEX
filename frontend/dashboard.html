@@ -7,6 +7,13 @@
 
     <title>CapitalGuard - Dashboard</title>
 
+    <script>
+        // Client-side auth guard
+        if (localStorage.getItem("capitalguard_logged_in") !== "true") {
+            window.location.href = "index.html";
+        }
+    </script>
+
    <link rel="stylesheet" href="../css/style.css">
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -47,6 +54,10 @@
                 🔄 Rebalancing
             </a>
 
+            <a href="#" onclick="logout(); return false;" style="margin-top: 2rem; color: #d64545;">
+                🚪 Logout
+            </a>
+
         </nav>
 
         <div class="sidebar-bottom">
@@ -72,304 +83,89 @@
     <!-- MAIN -->
 
     <main class="main">
-
         <header class="topbar">
-
             <div>
-                <h1>Dashboard</h1>
-                <p>Portfolio overview and risk intelligence</p>
+                <h1>Live Dashboard</h1>
+                <p>Synthetic Market Engine & Inverse-Vol Optimizer</p>
             </div>
-
             <div class="status">
-                <span class="status-dot"></span>
-                System Operational
+                <span class="status-dot"></span> System Operational
             </div>
-
         </header>
 
-
-        <!-- KPI CARDS -->
-
         <section class="cards">
-
             <div class="card">
-
-                <div class="card-title">
-                    Total Portfolio
-                </div>
-
-                <div class="card-value" id="kpi-portfolio">
-                    ₹1.00 Cr
-                </div>
-
-                <div class="positive" id="kpi-portfolio-sub">
-                    ↑ 4.8% expected return
-                </div>
-
+                <div class="card-title">Risk Engine Status</div>
+                <div class="card-value" id="kpi-risk-status">● OK</div>
             </div>
-
-
             <div class="card">
-
-                <div class="card-title">
-                    Risk Score
-                </div>
-
-                <div class="card-value" id="kpi-risk">
-                    32<span class="small-text">/100</span>
-                </div>
-
-                <div class="safe" id="kpi-risk-status">
-                    ● SAFE
-                </div>
-
+                <div class="card-title">Concentration Max</div>
+                <div class="card-value" id="risk-conc-val">--</div>
+                <div class="safe" id="risk-conc-status">--</div>
             </div>
-
-
             <div class="card">
-
-                <div class="card-title">
-                    Liquidity
-                </div>
-
-                <div class="card-value" id="kpi-liquidity">
-                    24%
-                </div>
-
-                <div class="positive" id="kpi-liquidity-status">
-                    ● Healthy
-                </div>
-
+                <div class="card-title">Volatility Spike Max</div>
+                <div class="card-value" id="risk-vol-val">--</div>
+                <div class="safe" id="risk-vol-status">--</div>
             </div>
-
-
-            <div class="card">
-
-                <div class="card-title">
-                    Expected Return
-                </div>
-
-                <div class="card-value" id="kpi-return">
-                    8.9%
-                </div>
-
-                <div class="positive">
-                    ↑ Optimized
-                </div>
-
-            </div>
-
         </section>
 
-
-        <!-- CHARTS -->
-
         <section class="dashboard-grid">
-
             <div class="panel">
-
                 <div class="panel-header">
-
-                    <div>
-                        <h2>Asset Allocation</h2>
-                        <p>Current portfolio distribution</p>
-                    </div>
-
+                    <div><h2>Asset Allocation</h2><p>Live target weights</p></div>
                 </div>
-
                 <div class="chart-container">
                     <canvas id="allocationChart"></canvas>
                 </div>
-
             </div>
-
 
             <div class="panel">
-
                 <div class="panel-header">
-
-                    <div>
-                        <h2>Risk Overview</h2>
-                        <p>Current portfolio health</p>
-                    </div>
-
-                    <span class="badge safe-badge">
-                        SAFE
-                    </span>
-
+                    <div><h2>Control Actions</h2><p>Live and hypothetical</p></div>
+                </div>
+                
+                <h4 style="margin-top:1rem;">⚡ Simulate Live Shock</h4>
+                <div style="display:flex; gap:10px; margin-top:5px; margin-bottom: 20px;">
+                    <select id="shock-asset" class="primary-btn" style="background:#f1f3f5; color:#333;">
+                        <option value="Equity">Equity</option>
+                        <option value="Bonds">Bonds</option>
+                        <option value="Gold">Gold</option>
+                        <option value="Crypto">Crypto</option>
+                        <option value="Cash">Cash</option>
+                    </select>
+                    <input type="number" id="shock-multiplier" value="5.0" step="0.5" style="width:70px; padding:5px;">
+                    <button class="primary-btn" onclick="simulateShock()">Shock</button>
                 </div>
 
-                <div class="risk-score">
-                    <div class="score-circle">
-                        <strong id="ro-score">32</strong>
-                        <span>/100</span>
-                    </div>
+                <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 15px 0;">
+
+                <h4>🔮 Run Scenario (No DB Write)</h4>
+                <div style="display:flex; gap:10px; margin-top:5px;">
+                    <select id="scenario-asset" class="primary-btn" style="background:#f1f3f5; color:#333;">
+                        <option value="Equity">Equity</option>
+                        <option value="Bonds">Bonds</option>
+                        <option value="Gold">Gold</option>
+                        <option value="Crypto">Crypto</option>
+                        <option value="Cash">Cash</option>
+                    </select>
+                    <input type="number" id="scenario-multiplier" value="10.0" step="0.5" style="width:70px; padding:5px;">
+                    <button class="primary-btn" onclick="runScenario()" style="background:#3182ce;">Run</button>
                 </div>
-
-                <div class="metric">
-
-                    <div>
-                        <span>Market Risk</span>
-                        <strong>28%</strong>
-                    </div>
-
-                    <div class="progress">
-                        <div id="ro-market" style="width:28%"></div>
-                    </div>
-
-                </div>
-
-
-                <div class="metric">
-
-                    <div>
-                        <span>Liquidity Risk</span>
-                        <strong>18%</strong>
-                    </div>
-
-                    <div class="progress">
-                        <div id="ro-liquidity" style="width:18%"></div>
-                    </div>
-
-                </div>
-
-
-                <div class="metric">
-
-                    <div>
-                        <span>Concentration</span>
-                        <strong>35%</strong>
-                    </div>
-
-                    <div class="progress">
-                        <div id="ro-concentration" style="width:35%"></div>
-                    </div>
-
-                </div>
-
+                <div id="scenario-result" style="margin-top: 10px; font-size: 0.9rem; color: #4a5568;"></div>
             </div>
-
         </section>
-
-
-        <!-- LOWER GRID -->
 
         <section class="dashboard-grid">
-
-            <div class="panel">
-
+            <div class="panel" style="grid-column: span 2;">
                 <div class="panel-header">
-
-                    <div>
-                        <h2>Risk Alerts</h2>
-                        <p>Latest control engine events</p>
-                    </div>
-
-                    <a href="risk.html" class="view-link">
-                        View all
-                    </a>
-
+                    <div><h2>Risk Alerts Feed</h2><p>Latest breaches from DB</p></div>
                 </div>
-
-
-                <div id="risk-alerts-list">
-                    <div class="alert success">
-
-                        <div class="alert-icon">✓</div>
-
-                        <div>
-                            <strong>Liquidity requirement satisfied</strong>
-                            <p>Available liquidity: 24%</p>
-                        </div>
-
-                    </div>
-
-
-                    <div class="alert warning">
-
-                        <div class="alert-icon">!</div>
-
-                        <div>
-                            <strong>Volatility approaching threshold</strong>
-                            <p>Current: 18% | Limit: 20%</p>
-                        </div>
-
-                    </div>
-
-
-                    <div class="alert success">
-
-                        <div class="alert-icon">✓</div>
-
-                        <div>
-                            <strong>Portfolio within allocation limits</strong>
-                            <p>No critical exposure detected</p>
-                        </div>
-
-                    </div>
+                <div id="risk-alerts-list" style="max-height: 300px; overflow-y: auto;">
+                    <!-- Alerts injected here -->
                 </div>
-
             </div>
-
-
-            <div class="panel">
-
-                <div class="panel-header">
-
-                    <div>
-                        <h2>Recent Decisions</h2>
-                        <p>Automated system actions</p>
-                    </div>
-
-                </div>
-
-
-                <div class="timeline">
-
-                    <div class="timeline-item">
-
-                        <div class="timeline-dot"></div>
-
-                        <div>
-                            <strong>Portfolio optimized</strong>
-                            <p>Risk reduced from 38 → 32</p>
-                            <small>10:45 AM</small>
-                        </div>
-
-                    </div>
-
-
-                    <div class="timeline-item">
-
-                        <div class="timeline-dot"></div>
-
-                        <div>
-                            <strong>Risk threshold checked</strong>
-                            <p>All critical controls passed</p>
-                            <small>10:42 AM</small>
-                        </div>
-
-                    </div>
-
-
-                    <div class="timeline-item">
-
-                        <div class="timeline-dot"></div>
-
-                        <div>
-                            <strong>Market data updated</strong>
-                            <p>5 assets refreshed</p>
-                            <small>10:40 AM</small>
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
         </section>
-
     </main>
 
 </div>
