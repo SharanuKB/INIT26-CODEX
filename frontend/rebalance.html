@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CapitalGuard - Rebalancing</title>
+
+  <link rel="stylesheet" href="../css/style.css">
+
+</head>
+
+<body>
+
+<div class="app">
+
+    <aside class="sidebar">
+
+        <div class="brand">
+            <div class="logo-icon small">CG</div>
+            <span>CapitalGuard</span>
+        </div>
+
+        <nav>
+
+            <a href="dashboard.html">📊 Dashboard</a>
+            <a href="optimization.html">⚙️ Optimization</a>
+            <a href="risk.html">🛡️ Risk Monitor</a>
+            <a href="simulation.html">💥 Simulation</a>
+            <a class="active" href="rebalance.html">🔄 Rebalancing</a>
+
+        </nav>
+
+    </aside>
+
+
+    <main class="main">
+
+        <header class="topbar">
+
+            <div>
+
+                <h1>Rebalancing Center</h1>
+
+                <p>
+                    Recommended actions to restore portfolio balance
+                </p>
+
+            </div>
+
+        </header>
+
+
+        <div class="panel">
+
+            <div class="panel-header">
+
+                <div>
+
+                    <h2>Current vs Target Allocation</h2>
+
+                    <p>
+                        System-generated recommendation
+                    </p>
+
+                </div>
+
+                <span class="badge warning-badge">
+                    ACTION REQUIRED
+                </span>
+
+            </div>
+
+
+            <table class="rebalance-table">
+
+                <thead>
+
+                    <tr>
+                        <th>Asset</th>
+                        <th>Current</th>
+                        <th>Target</th>
+                        <th>Change</th>
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    <tr>
+
+                        <td>Equity</td>
+                        <td>45%</td>
+                        <td>35%</td>
+                        <td class="negative">−10%</td>
+
+                    </tr>
+
+
+                    <tr>
+
+                        <td>Bonds</td>
+                        <td>25%</td>
+                        <td>30%</td>
+                        <td class="positive">+5%</td>
+
+                    </tr>
+
+
+                    <tr>
+
+                        <td>Gold</td>
+                        <td>15%</td>
+                        <td>15%</td>
+                        <td>0%</td>
+
+                    </tr>
+
+
+                    <tr>
+
+                        <td>Corporate Bonds</td>
+                        <td>10%</td>
+                        <td>10%</td>
+                        <td>0%</td>
+
+                    </tr>
+
+
+                    <tr>
+
+                        <td>Cash</td>
+                        <td>5%</td>
+                        <td>10%</td>
+                        <td class="positive">+5%</td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+
+            <button
+                class="primary-btn"
+                onclick="applyRebalance()"
+            >
+                ✓ Apply Recommendation
+            </button>
+
+            <p id="rebalanceMessage"></p>
+
+        </div>
+
+
+        <div class="panel recommendation">
+
+            <h2>🤖 Why Rebalance?</h2>
+
+            <p>
+                Equity exposure is above the configured 40% threshold.
+                The system recommends reducing equity exposure and
+                increasing bonds and cash to improve diversification
+                and liquidity.
+            </p>
+
+        </div>
+
+    </main>
+
+</div>
+
+<script src="../js/app.js"></script>
+<script src="../js/rebalance.js"></script>
+
+</body>
+</html>
