@@ -1,78 +1,135 @@
 const allocationCanvas = document.getElementById("allocationChart");
 let chartInstance = null;
+let ws = null;
+
+const ASSETS = ["Equity", "Bonds", "Gold", "Corporate Bonds", "Cash"];
+
+function renderChart(weights) {
+    if (!allocationCanvas) return;
+    const chartData = ASSETS.map(l => (weights[l] || 0) * 100);
+    
+    if (chartInstance) {
+        chartInstance.data.datasets[0].data = chartData;
+        chartInstance.update();
+    } else {
+        chartInstance = new Chart(allocationCanvas, {
+            type: "doughnut",
+            data: {
+                labels: ASSETS,
+                datasets: [{ data: chartData }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: "bottom" } }
+            }
+        });
+    }
+}
 
 async function loadDashboard() {
     try {
-        const response = await fetch('/api/portfolio');
-        const data = await response.json();
+        // Init HTTP Fetch
+        const pf = await fetch('/api/portfolio').then(r => r.json());
+        renderChart(pf.weights);
         
-        // Update Chart
-        if (allocationCanvas) {
-            const labels = ["Equity", "Bonds", "Gold", "Corporate Bonds", "Cash"];
-            const chartData = labels.map(l => data.weights_pct[l] || 0);
-            
-            if (chartInstance) chartInstance.destroy();
-            
-            chartInstance = new Chart(allocationCanvas, {
-                type: "doughnut",
-                data: {
-                    labels: labels,
-                    datasets: [{ data: chartData }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { position: "bottom" } }
-                }
-            });
-        }
+        const risk = await fetch('/api/risk-status').then(r => r.json());
+        updateRiskPanel(risk);
         
-        // Update KPIs
-        const totalCapital = data.allocations["Equity"] / (data.weights["Equity"] || 1); // approx or just hardcode 1Cr
-        const cap = Object.values(data.allocations).reduce((a,b)=>a+b, 0);
-        document.getElementById("kpi-portfolio").textContent = `₹${(cap/10000000).toFixed(2)} Cr`;
-        document.getElementById("kpi-portfolio-sub").textContent = `↑ ${(data.expected_return*100).toFixed(2)}% expected return`;
+        const alerts = await fetch('/api/alerts').then(r => r.json());
+        updateAlerts(alerts);
         
-        document.getElementById("kpi-risk").innerHTML = `${Math.round(data.risk.overall_risk)}<span class="small-text">/100</span>`;
-        document.getElementById("kpi-risk-status").textContent = `● ${data.risk.status}`;
-        document.getElementById("kpi-risk-status").className = data.risk.status === "SAFE" ? "safe" : (data.risk.status === "WARNING" ? "warning" : "critical");
-        
-        document.getElementById("kpi-liquidity").textContent = `${data.liquidity_ratio.toFixed(2)}%`;
-        document.getElementById("kpi-liquidity-status").textContent = data.liquidity_ratio >= 20 ? "● Healthy" : "● Low";
-        
-        document.getElementById("kpi-return").textContent = `${(data.expected_return*100).toFixed(2)}%`;
-        
-        // Update Risk Overview (assuming there are elements with these IDs in risk overview panel, if not they'll just silently fail or we need to add them)
-        const roScore = document.getElementById("ro-score");
-        if (roScore) roScore.textContent = Math.round(data.risk.overall_risk);
-        const mRisk = document.getElementById("ro-market");
-        if (mRisk) mRisk.style.width = `${data.risk.market_risk}%`;
-        const lRisk = document.getElementById("ro-liquidity");
-        if (lRisk) lRisk.style.width = `${data.risk.liquidity_risk}%`;
-        const cRisk = document.getElementById("ro-concentration");
-        if (cRisk) cRisk.style.width = `${data.risk.concentration_risk}%`;
-        
-        // Update alerts
-        const alertsList = document.getElementById("risk-alerts-list");
-        if (alertsList) {
-            alertsList.innerHTML = "";
-            data.risk.thresholds.forEach(t => {
-                const isSafe = t.status === "SAFE";
-                alertsList.innerHTML += `
-                    <div class="alert-item">
-                        <div class="alert-icon ${isSafe ? 'safe-icon' : 'warning-icon'}">${isSafe ? '✓' : '⚠️'}</div>
-                        <div class="alert-content">
-                            <strong>${t.metric}</strong>
-                            <p>${t.current_pct.toFixed(1)}% (Limit: ${t.limit_pct}%)</p>
+        // Connect WebSocket
+        ws = new WebSocket(`ws://${location.host}/ws/alerts`);
+        ws.onmessage = (event) => {
+            const msg = JSON.parse(event.data);
+            if (msg.type === "portfolio_update") {
+                renderChart(msg.portfolio.weights);
+                // re-fetch risk silently
+                fetch('/api/risk-status').then(r => r.json()).then(updateRiskPanel);
+            } else if (msg.type === "alerts") {
+                // prepend new alerts
+                msg.data.forEach(a => {
+                    const html = `
+                    <div class="alert warning">
+                        <div class="alert-icon">⚠️</div>
+                        <div>
+                            <strong>${a.metric} Breach</strong>
+                            <p>Val: ${a.value.toFixed(2)} | Limit: ${a.threshold}</p>
+                            <small>${new Date(a.timestamp).toLocaleTimeString()}</small>
                         </div>
-                    </div>
-                `;
-            });
-        }
-        
+                    </div>`;
+                    const list = document.getElementById("risk-alerts-list");
+                    if (list) list.insertAdjacentHTML('afterbegin', html);
+                });
+            }
+        };
     } catch (e) {
         console.error("Failed to load dashboard data", e);
     }
+}
+
+function updateRiskPanel(risk) {
+    const sElement = document.getElementById("kpi-risk-status");
+    if (sElement) {
+        sElement.textContent = risk.breached ? "● BREACHED" : "● SAFE";
+        sElement.className = risk.breached ? "critical" : "safe";
+    }
+    const cVal = risk.metrics.concentration.max_val;
+    const cBreach = risk.metrics.concentration.breached;
+    document.getElementById("risk-conc-val").textContent = (cVal * 100).toFixed(1) + "%";
+    document.getElementById("risk-conc-status").textContent = cBreach ? "Breached" : "Safe";
+    document.getElementById("risk-conc-status").style.color = cBreach ? "#d64545" : "#28a745";
+
+    const vVal = risk.metrics.volatility_spike.max_val;
+    const vBreach = risk.metrics.volatility_spike.breached;
+    document.getElementById("risk-vol-val").textContent = vVal.toFixed(2) + "x";
+    document.getElementById("risk-vol-status").textContent = vBreach ? "Breached" : "Safe";
+    document.getElementById("risk-vol-status").style.color = vBreach ? "#d64545" : "#28a745";
+}
+
+function updateAlerts(alerts) {
+    const list = document.getElementById("risk-alerts-list");
+    if (!list) return;
+    list.innerHTML = "";
+    alerts.forEach(a => {
+        list.innerHTML += `
+        <div class="alert warning">
+            <div class="alert-icon">⚠️</div>
+            <div>
+                <strong>${a.metric} Breach</strong>
+                <p>Val: ${a.value.toFixed(2)} | Limit: ${a.threshold}</p>
+                <small>${new Date(a.timestamp).toLocaleTimeString()}</small>
+            </div>
+        </div>`;
+    });
+}
+
+async function simulateShock() {
+    const asset = document.getElementById("shock-asset").value;
+    const mult = parseFloat(document.getElementById("shock-multiplier").value);
+    await fetch('/api/simulate-shock', {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({asset, multiplier: mult})
+    });
+    alert(`Shock initiated for ${asset} at ${mult}x volatility.`);
+}
+
+async function runScenario() {
+    const asset = document.getElementById("scenario-asset").value;
+    const mult = parseFloat(document.getElementById("scenario-multiplier").value);
+    const res = await fetch('/api/scenario', {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({asset, multiplier: mult})
+    }).then(r => r.json());
+    
+    document.getElementById("scenario-result").innerHTML = `
+        <p><strong>Breach:</strong> ${res.risk_breached}</p>
+        <p><strong>Alerts:</strong> ${res.alerts_generated}</p>
+        <p><strong>Hypothetical Weight for ${asset}:</strong> ${(res.hypothetical_weights[asset]*100).toFixed(1)}%</p>
+    `;
 }
 
 document.addEventListener("DOMContentLoaded", loadDashboard);
