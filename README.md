@@ -23,58 +23,52 @@ CapitalGuard is an automated capital management and optimization tool designed t
 
 ## The Financial Model
 
-CapitalGuard uses a dual-engine optimization approach:
-- **Markowitz Mean-Variance Optimization (QP):** Solved via `scipy.optimize.minimize` (SLSQP). This is the primary engine. The objective function maximizes Risk-Adjusted Return: `Expected Return - λ * Volatility`, where `λ` is the risk aversion parameter.
-- **Linear-Programming Fallback (LP):** Solved via `scipy.optimize.linprog` (HiGHS). Used if the non-linear solver fails to converge.
+CapitalGuard uses a robust optimization approach driven by both static rules and dynamic market conditions:
+- **Markowitz Mean-Variance Optimization (QP):** Solved via `scipy.optimize.minimize` (SLSQP). This is the primary engine used to maximize Risk-Adjusted Return.
+- **Dynamic Target Weighting (Live Engine):** The system continuously recalculates target weights based on real-time asset volatility (standard deviation of recent returns) to ensure risk parity and avoid excessive exposure.
 
 **Constraints enforced automatically:**
 - Total Allocation = 100%
 - Minimum Cash Buffer >= 10%
 - Minimum Liquidity Coverage >= 20%
-- Asset-specific minimums and regulatory maximum exposure bounds
+- Asset-specific minimums and regulatory maximum exposure bounds (e.g., max 30% per asset dynamically capped)
 - No short-selling (all weights >= 0)
 
-## The Asset Universe
+## Live Synthetic Market & Persistence
 
-Our baseline hackathon simulation uses a 5-asset universe:
-
-| Asset | Expected Return | Risk | Max Allocation | Min Allocation | Liquid? |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **Equity** | 12% | High | 40% | 0% | No |
-| **Bonds** | 7% | Low | 50% | 0% | Yes |
-| **Gold** | 8% | Medium | 30% | 0% | No |
-| **Corporate Bonds** | 9% | Medium | 35% | 0% | No |
-| **Cash** | 4% | Very Low | 30% | 10% | Yes |
+Unlike static portfolio optimizers, CapitalGuard features a **Live FinTech Engine**:
+- **SQLite Persistence:** Portfolio state, price history, and risk alerts are saved in a local SQLite database (`capitalguard.db`) utilizing WAL mode for concurrent access.
+- **Market Simulation Loop:** A background async task continually updates asset prices using Gaussian random walks, simulating market movements.
+- **Dynamic Rebalancing:** As prices drift, the system automatically recalibrates target weights and triggers rebalancing if deviation bands are breached.
+- **Real-Time WebSockets:** Critical risk alerts (e.g., Concentration Risk or Volatility Spikes) and portfolio updates are broadcasted to the frontend instantly via WebSockets (`/ws/alerts`).
 
 ## Stress-Test Scenarios
 
-The platform includes a robust simulation engine for 5 hypothetical market shocks:
-1. **Equity Crash:** Equities fall sharply (-5% return) and equity volatility surges by 50%.
-2. **Liquidity Crisis:** Market liquidity dries up. Required liquidity buffer is raised to 35%, and the cash minimum is increased to 20%.
-3. **Stagflation:** High inflation and stagnant growth. Gold yields rise to 14%, while Equities drop to 5% and Corporate Bonds to 6%.
-4. **Rate Hike:** Central bank raises interest rates. Cash yield jumps to 6.5%, driving Bond yields down to 3.5%.
-5. **Market Crash:** A broad sell-off across both equities (-8%) and corporate credit (-2%), gold acts as a safe haven (+3%), and systemic volatility spikes across the entire covariance matrix (1.6x multiplier).
-
-## Design Trade-offs
-
-- **Mean-Variance vs. Linear:** Mean-variance realistically models correlations (e.g., Equity vs. Bonds), capturing diversification benefits better than linear sum-of-parts risk.
-- **SLSQP with LP Fallback:** SLSQP is powerful for quadratic constraints but sensitive to initial conditions. The LP fallback ensures the system always returns a safe, compliant allocation even under extreme numerical stress.
-- **Risk Score Normalization:** For the UI, raw portfolio volatility (typically 0.05 - 0.20) is scaled to a human-readable 0-100 score (`volatility / 0.30 * 100`).
-- **FastAPI Migration:** The backend was migrated from Flask to FastAPI to provide out-of-the-box async readiness, automatic strict request validation using Pydantic (throwing 422s for bad inputs instead of 500s), and auto-generated OpenAPI documentation accessible at `/docs`.
+The platform includes a robust simulation engine for evaluating market shocks:
+1. **Interactive Asset Shocks:** You can inject targeted shocks into specific assets (e.g., multiplying volatility) to test the system's real-time reaction.
+2. **Pre-defined Macros:** 
+   - **Equity Crash:** Equities fall sharply (-5% return) and equity volatility surges.
+   - **Liquidity Crisis:** Market liquidity dries up. Required liquidity buffer is raised.
+   - **Stagflation:** High inflation and stagnant growth. 
+   - **Rate Hike:** Central bank raises interest rates. 
+   - **Market Crash:** A broad sell-off across equities and corporate credit.
 
 ## API Reference
 
-| Method | Endpoint | Description | Example Response |
-| :--- | :--- | :--- | :--- |
-| **GET** | `/api/assets` | Returns the configured asset universe. | `[{"name": "Equity", "expected_return": 0.12...}]` |
-| **GET** | `/api/portfolio` | Fetches the optimal allocation based on URL params (`capital`, `risk`). | `{"weights": {"Equity": 0.40...}, "risk": {...}}` |
-| **GET** | `/api/risk` | Returns risk KPIs and threshold status. | `{"overall_risk": 32, "status": "SAFE"...}` |
-| **POST** | `/api/optimize` | Generates a new portfolio with custom constraints. | `{"weights_pct": {"Equity": 35.0...}}` |
-| **POST** | `/api/simulate` | Evaluates impact of a specific market shock. | `{"loss_pct": 12.5, "recommended_allocation": {...}}` |
-| **POST** | `/api/rebalance`| Calculates drift between current vs optimal target. | `{"needs_rebalance": true, "rows": [...]}` |
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| **GET** | `/api/assets` | Returns the configured asset universe. |
+| **GET** | `/api/portfolio` | Fetches the current live portfolio weights and last traded prices. |
+| **GET** | `/api/risk-status` | Returns the live risk status, including any breached thresholds. |
+| **GET** | `/api/alerts` | Fetches the most recent system alerts generated by the live engine. |
+| **POST** | `/api/optimize` | Generates a new portfolio with custom constraints. |
+| **POST** | `/api/simulate` | Evaluates the theoretical impact of a specific market shock macro. |
+| **POST** | `/api/simulate-shock`| Injects a live volatility shock to a specific asset in the simulation loop. |
+| **POST** | `/api/scenario`| Calculates hypothetical weights and risk metrics under a temporary shock scenario. |
+| **WS** | `/ws/alerts` | WebSocket endpoint for real-time risk alerts and portfolio updates. |
 
-## Known Limitations
+## Design Trade-offs
 
-- **In-Memory Only:** No database persistence. Refreshing resets state.
-- **Simulated Data:** The system does not currently connect to a live market data feed (e.g., Bloomberg or Yahoo Finance API). Returns and covariances are static estimations.
-- **Demo Auth:** The login screen (`admin` / `admin`) is a frontend mockup for hackathon presentation purposes.
+- **Mean-Variance vs. Linear:** Mean-variance realistically models correlations, capturing diversification benefits better than linear sum-of-parts risk.
+- **SQLite for Live Data:** Used for ease of deployment in hackathon environments while still providing ACID properties and time-series history tracking via `price_history`.
+- **FastAPI Migration:** The backend provides out-of-the-box async readiness (critical for the WebSocket and live loop), automatic strict request validation using Pydantic, and auto-generated OpenAPI documentation accessible at `/docs`.
