@@ -5,9 +5,7 @@ Portfolio constraints modeling, boundary calculations, and compliance validation
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple, Any
 import numpy as np
-
 from optimization.assets import Asset
-
 
 @dataclass
 class PortfolioConstraints:
